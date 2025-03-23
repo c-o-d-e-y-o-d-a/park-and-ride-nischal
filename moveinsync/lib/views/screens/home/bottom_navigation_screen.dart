@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:moveinsync/views/components/custom_drawer.dart';
 import 'package:moveinsync/views/screens/home/home_screen.dart';
 import 'package:moveinsync/views/screens/home/profile_screen.dart';
 
@@ -29,7 +30,9 @@ class _BottomNavBarDashBoardState extends State<BottomNavBarDashBoard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: CustomDrawer(),
       body: _screens[_currentIndex],
+     
       bottomNavigationBar: Container(
         padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 6.h),
         decoration: BoxDecoration(

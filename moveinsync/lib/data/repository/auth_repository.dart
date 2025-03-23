@@ -1,5 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 
 class AuthRepository {
@@ -9,7 +10,7 @@ class AuthRepository {
   AuthRepository() {
     _client = Client()
         .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
-        .setProject('67dc7e1e0013be3ea090'); // Your project ID
+        .setProject(dotenv.env['PROJECT_ID']); // Your project ID
 
     _account = Account(_client);
   }

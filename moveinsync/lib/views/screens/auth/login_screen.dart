@@ -68,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(width: 8.w),
                   Text(
-                    'Logoipsum',
+                    'MoveInSync',
                     style: TextStyle(
                       fontSize: 20.sp,
                       fontWeight: FontWeight.bold,
@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Text(
                 'Sign in to your\nAccount',
                 style: TextStyle(
-                  fontSize: 34.sp,
+                  fontSize: 28.sp,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF121212),
                   height: 1.1,

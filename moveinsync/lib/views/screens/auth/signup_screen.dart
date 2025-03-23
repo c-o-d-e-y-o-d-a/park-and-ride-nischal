@@ -69,7 +69,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   SizedBox(width: 8.w),
                   Text(
-                    'Logoipsum',
+                    'MoveInSync',
                     style: TextStyle(
                       fontSize: 20.sp,
                       fontWeight: FontWeight.bold,
@@ -83,7 +83,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               Text(
                 'Create an Account',
                 style: TextStyle(
-                  fontSize: 34.sp,
+                  fontSize: 28.sp,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF121212),
                   height: 1.1,
