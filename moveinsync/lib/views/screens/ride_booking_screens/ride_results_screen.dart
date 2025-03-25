@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mapbox_search/mapbox_search.dart';
 import 'package:moveinsync/data/controller/ride_controller.dart';
 import 'package:moveinsync/models/ride_model.dart';
 
@@ -8,9 +9,16 @@ class RideResultsScreen extends StatelessWidget {
   final String from;
   final String to;
   final RideController rideController = Get.find<RideController>();
+  final Suggestion fromPlace;
+  final Suggestion toPlace;
 
-  RideResultsScreen({Key? key, required this.from, required this.to})
-    : super(key: key);
+  RideResultsScreen(
+      {Key? key,
+      required this.from,
+      required this.to,
+      required this.fromPlace,
+      required this.toPlace})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +46,6 @@ class RideResultsScreen extends StatelessWidget {
           return ListView.builder(
             itemCount: rideController.rideOptions.length,
             itemBuilder: (context, index) {
-              
               final Ride ride = rideController.rideOptions[index];
 
               return GestureDetector(
@@ -50,6 +57,8 @@ class RideResultsScreen extends StatelessWidget {
                       'to': ride.to,
                       'vehicle': ride.vehicle,
                       'price': ride.price,
+                      'fromPlace': fromPlace,
+                      'toPlace': toPlace,
                     },
                   );
                 },
@@ -71,14 +80,6 @@ class RideResultsScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    trailing: Text(
-                      "₹${ride.price.toStringAsFixed(2)}",
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
                       ),
                     ),
                   ),

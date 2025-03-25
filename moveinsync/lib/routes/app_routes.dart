@@ -23,35 +23,31 @@ class AppRoutes {
       page: () => RideResultsScreen(
         from: Get.arguments['from'],
         to: Get.arguments['to'],
+        fromPlace: Get.arguments['fromPlace'],
+        toPlace: Get.arguments['toPlace'],
       ),
     ),
-
     GetPage(
       name: '/rideConfirmation',
       page: () => RideConfirmationScreen(
         from: Get.arguments['from'],
         to: Get.arguments['to'],
         vehicle: Get.arguments['vehicle'],
-        price: Get.arguments['price'],
+        fromPlace: Get.arguments['fromPlace'],
+        toPlace: Get.arguments['toPlace'],
       ),
     ),
-     GetPage(name: '/rideHistory', page: () => RideHistoryScreen()),
-      GetPage(name: '/parkingSearch', page: () => ParkingSearchScreen()),
+    GetPage(name: '/rideHistory', page: () => RideHistoryScreen()),
+    GetPage(name: '/parkingSearch', page: () => ParkingSearchScreen()),
     GetPage(
       name: '/parkingResults',
-      page:
-          () =>
-              ParkingResultsScreen(metroStation: Get.arguments['metroStation']),
-    ),
-     GetPage(
-      name: '/soon',
-      page:
-          () =>
-              const ComingSoonScreen(),
+      page: () =>
+          ParkingResultsScreen(metroStation: Get.arguments['metroStation']),
     ),
     GetPage(
-      name: '/parkingSlots',
-      page: () => ParkingSlotsScreen()
+      name: '/soon',
+      page: () => const ComingSoonScreen(),
     ),
+    GetPage(name: '/parkingSlots', page: () => ParkingSlotsScreen()),
   ];
 }

@@ -1,13 +1,39 @@
+import 'dart:developer';
+
+import 'package:async_searchable_dropdown/async_searchable_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mapbox_search/mapbox_search.dart';
 import 'package:moveinsync/data/controller/ride_controller.dart';
+import 'package:moveinsync/views/screens/ride_booking_screens/ride_confirmation_screen.dart';
 import 'ride_results_screen.dart';
 
-class RideSearchScreen extends StatelessWidget {
+class RideSearchScreen extends StatefulWidget {
+  const RideSearchScreen({super.key});
+
+  @override
+  State<RideSearchScreen> createState() => _RideSearchScreenState();
+}
+
+class _RideSearchScreenState extends State<RideSearchScreen> {
   final TextEditingController fromController = TextEditingController();
   final TextEditingController toController = TextEditingController();
   final RideController rideController = Get.find<RideController>();
+  List<Suggestion> places = [];
+  Suggestion? fromPlace;
+  Suggestion? toPlace;
+  SearchBoxAPI mapboxSearch = SearchBoxAPI(
+    limit: 6,
+  );
+  List<String> dropdownMenuEntries = [
+    'Bangalore',
+    'Mumbai',
+    'Delhi',
+    'Chennai',
+    'Kolkata',
+    'Hyderabad',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -45,42 +71,53 @@ class RideSearchScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20.h),
-
-              TextField(
-                controller: fromController,
-                decoration: InputDecoration(
-                  labelText: 'From',
-                  hintText: 'Enter pickup location',
-                  prefixIcon: Icon(Icons.location_on, color: Colors.blue),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide.none,
+              SearchableDropdown<String>(
+                  inputDecoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'From',
+                    prefixIcon: Icon(Icons.search),
                   ),
-                ),
-              ),
+                  remoteItems: (search) async {
+                    ApiResponse<SuggestionResponse> searchPlace =
+                        await mapboxSearch.getSuggestions(search ?? "");
+                    places = searchPlace.success?.suggestions ?? [];
+                    return searchPlace.success?.suggestions
+                            .map((e) => "${e.name}\n${e.fullAddress}")
+                            .toList() ??
+                        [searchPlace.failure?.error ?? ""];
+                  },
+                  itemLabelFormatter: (value) => value,
+                  value: "china",
+                  onChanged: (value) {
+                    fromController.text = value ?? "";
+                    fromPlace = places.firstWhere(
+                        (element) => element.name == value?.split('\n')[0]);
+                  }),
               SizedBox(height: 15.h),
-
-              TextField(
-                controller: toController,
-                decoration: InputDecoration(
-                  labelText: 'To',
-                  hintText: 'Enter destination',
-                  prefixIcon: Icon(
-                    Icons.location_on_outlined,
-                    color: Colors.blue,
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide.none,
-                  ),
+              SearchableDropdown<String>(
+                inputDecoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'From',
+                  prefixIcon: Icon(Icons.search),
                 ),
+                remoteItems: (search) async {
+                  ApiResponse<SuggestionResponse> searchPlace =
+                      await mapboxSearch.getSuggestions(search ?? "");
+                  places = searchPlace.success?.suggestions ?? [];
+                  return searchPlace.success?.suggestions
+                          .map((e) => "${e.name}\n${e.fullAddress}")
+                          .toList() ??
+                      [searchPlace.failure?.error ?? ""];
+                },
+                itemLabelFormatter: (value) => value,
+                value: "china",
+                onChanged: (value) {
+                  toController.text = value ?? "";
+                  toPlace = places.firstWhere(
+                      (element) => element.name == value?.split('\n')[0]);
+                },
               ),
               SizedBox(height: 25.h),
-
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -89,10 +126,21 @@ class RideSearchScreen extends StatelessWidget {
                       fromController.text,
                       toController.text,
                     );
+                    log("From: ${fromController.text}\n To: ${toController.text}");
+                    // Get.to(() => RideConfirmationScreen(
+                    //       from: fromController.text,
+                    //       to: toController.text,
+                    //       vehicle: "Car",
+                    //       price: 1000.0,
+                    //       fromPlace: fromPlace!,
+                    //       toPlace: toPlace!,
+                    //     ));
                     Get.to(
                       () => RideResultsScreen(
                         from: fromController.text,
                         to: toController.text,
+                        fromPlace: fromPlace!,
+                        toPlace: toPlace!,
                       ),
                     );
                   },
