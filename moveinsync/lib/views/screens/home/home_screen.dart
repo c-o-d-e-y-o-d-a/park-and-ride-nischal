@@ -139,7 +139,7 @@ class HomeScreen extends StatelessWidget {
                 {'icon': Icons.local_parking, 'text': 'Parking Slots',
                   'route': '/parkingSlots',
                 },
-                {'icon': Icons.receipt, 'text': 'Payments', 'route': '/'},
+                {'icon': Icons.receipt, 'text': 'Payments', 'route': '/soon'},
               ]),
               SizedBox(height: 15.h),
 
@@ -154,8 +154,8 @@ class HomeScreen extends StatelessWidget {
               SizedBox(height: 16.h),
               _gridItems([
                 {'icon': Icons.history, 'text': 'Ride History', 'route': '/rideHistory'},
-                {'icon': Icons.event, 'text': 'Metro', 'route': '/'},
-                {'icon': Icons.report, 'text': 'Reports', 'route': '/'},
+                {'icon': Icons.event, 'text': 'Metro', 'route': '/soon'},
+                {'icon': Icons.report, 'text': 'Reports', 'route': '/soon'},
               ]),
               SizedBox(height: 15.h),
 

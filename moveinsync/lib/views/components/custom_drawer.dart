@@ -62,12 +62,12 @@ class CustomDrawer extends StatelessWidget {
           _drawerItem(
             icon: Icons.car_rental,
             text: "My Rides",
-            onTap: () => Get.toNamed('/rides'),
+            onTap: () => Get.toNamed('/rideHistory'),
           ),
           _drawerItem(
             icon: Icons.local_parking,
             text: "Parking Slots",
-            onTap: () => Get.toNamed('/parking'),
+            onTap: () => Get.toNamed('/parkingSlots'),
           ),
          
            _drawerItem(

@@ -5,9 +5,10 @@ import 'package:moveinsync/data/controller/parking_spots_controller.dart';
 import 'package:moveinsync/views/screens/parking_booking_screens/parking_available_screen.dart';
 import 'package:searchfield/searchfield.dart';
 
+
 class ParkingSearchScreen extends StatelessWidget {
   final TextEditingController searchController = TextEditingController();
-  final ParkingController parkingController = Get.put(ParkingController());
+  final ParkingController parkingController = Get.put(ParkingController( ));
 
   @override
   Widget build(BuildContext context) {
@@ -48,29 +49,39 @@ class ParkingSearchScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20.h),
-
-              // SearchField for Metro Station Search
-              SearchField(
-                controller: searchController,
-                suggestions:
-                    parkingController.metroStations
-                        .map((station) => SearchFieldListItem(station))
-                        .toList(),
-                suggestionStyle: TextStyle(
-                  fontSize: 14.sp,
-                  color: Colors.black54,
-                ),
-                
+              FutureBuilder<List<String>>(
+                future:
+                    parkingController
+                        .fetchMetroStations(), 
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError ||
+                      !snapshot.hasData ||
+                      snapshot.data!.isEmpty) {
+                    return const Text("No metro stations available.");
+                  }
+                  return SearchField(
+                    controller: searchController,
+                    suggestions:
+                        snapshot.data!
+                            .map((station) => SearchFieldListItem(station))
+                            .toList(),
+                    suggestionStyle: TextStyle(
+                      fontSize: 14.sp,
+                      color: Colors.black54,
+                    ),
+                  );
+                },
               ),
-              SizedBox(height: 25.h),
 
-              // Search Button
+              SizedBox(height: 25.h),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
                     if (searchController.text.isNotEmpty) {
-                      parkingController.fetchParkingData(searchController.text);
                       Get.to(
                         () => ParkingResultsScreen(
                           metroStation: searchController.text,

@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:moveinsync/views/components/custom_drawer.dart';
 import 'package:moveinsync/views/screens/home/home_screen.dart';
 import 'package:moveinsync/views/screens/home/profile_screen.dart';
+import 'package:moveinsync/views/screens/parking_booking_screens/parking_search_screen.dart';
+import 'package:moveinsync/views/screens/ride_booking_screens/ride_search_screen.dart';
 
 class BottomNavBarDashBoard extends StatefulWidget {
   const BottomNavBarDashBoard({super.key});
@@ -16,8 +18,8 @@ class _BottomNavBarDashBoardState extends State<BottomNavBarDashBoard> {
 
   final List<Widget> _screens = [
     HomeScreen(),
-    Container(color: Colors.green),
-    Container(color: Colors.blue),
+    RideSearchScreen(),
+    ParkingSearchScreen( ),
     ProfileScreen(),
   ];
 

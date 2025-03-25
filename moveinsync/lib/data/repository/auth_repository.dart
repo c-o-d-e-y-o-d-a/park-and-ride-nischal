@@ -9,8 +9,8 @@ class AuthRepository {
 
   AuthRepository() {
     _client = Client()
-        .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
-        .setProject(dotenv.env['PROJECT_ID']); // Your project ID
+        .setEndpoint('https://cloud.appwrite.io/v1') 
+        .setProject(dotenv.env['PROJECT_ID']); 
 
     _account = Account(_client);
   }
@@ -32,7 +32,6 @@ Future<void> updateUserProfile(
     }
   }
 
-  /// Create a new user account
   Future<User?> signUp(String name, String email, String password) async {
     try {
       final user = await _account.create(
@@ -48,7 +47,6 @@ Future<void> updateUserProfile(
     }
   }
 
-  /// Login user with email & password
   Future<Session?> login(String email, String password) async {
     try {
       final session = await _account.createEmailPasswordSession(
@@ -62,17 +60,15 @@ Future<void> updateUserProfile(
     }
   }
 
-  /// Get current logged-in user
   Future<User?> getCurrentUser() async {
     try {
       final user = await _account.get();
       return user;
     } catch (e) {
-      return null; // Not logged in
+      return null; 
     }
   }
 
-  /// Logout user
   Future<void> logout() async {
     try {
       await _account.deleteSession(sessionId: 'current');

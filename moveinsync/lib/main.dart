@@ -32,9 +32,9 @@ class MyApp extends StatelessWidget {
       builder: (_, child) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
-          initialRoute: '/login',
+          initialRoute: '/onboarding',
           getPages: AppRoutes.routes,
-      
+
           home: child,
         );
       },

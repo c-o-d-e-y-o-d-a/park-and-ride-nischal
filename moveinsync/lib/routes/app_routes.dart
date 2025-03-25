@@ -3,10 +3,10 @@ import 'package:moveinsync/views/screens/auth/login_screen.dart';
 import 'package:moveinsync/views/screens/auth/signup_screen.dart';
 import 'package:moveinsync/views/screens/coming_soon_screen.dart';
 import 'package:moveinsync/views/screens/home/bottom_navigation_screen.dart';
+import 'package:moveinsync/views/screens/onboarding_screen.dart';
 import 'package:moveinsync/views/screens/parking_booking_screens/parking_available_screen.dart';
 import 'package:moveinsync/views/screens/parking_booking_screens/parking_search_screen.dart';
 import 'package:moveinsync/views/screens/parking_booking_screens/parking_slots_details.dart';
-import 'package:moveinsync/views/screens/payments/payment_screen.dart';
 import 'package:moveinsync/views/screens/ride_booking_screens/ride_history_screen.dart';
 import 'package:moveinsync/views/screens/ride_booking_screens/ride_search_screen.dart';
 import 'package:moveinsync/views/screens/ride_booking_screens/ride_results_screen.dart';
@@ -53,5 +53,6 @@ class AppRoutes {
       name: '/parkingSlots',
       page: () => ParkingSlotsScreen()
     ),
+    GetPage(name: '/onboarding', page: () => OnboardingScreen()),
   ];
 }

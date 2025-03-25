@@ -4,10 +4,24 @@ import 'package:get/get.dart';
 import 'package:moveinsync/data/controller/payment_controller.dart';
 
 class PaymentScreen extends StatelessWidget {
-  final PaymentController paymentController = Get.put(PaymentController());
+  final Function onPaymentSuccess;
+  
   final double amount;
 
-   PaymentScreen({super.key, required this.amount});
+   PaymentScreen({super.key, required this.amount, required this.onPaymentSuccess});
+   final PaymentController paymentController = Get.put(
+    PaymentController(
+      onPaymentSuccess: () {
+        Get.snackbar(
+          "Payment Success",
+          "Payment was successful!",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      },
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {

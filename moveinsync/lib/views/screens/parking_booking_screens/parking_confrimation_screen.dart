@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:moveinsync/data/controller/parking_spots_controller.dart';
 import 'package:moveinsync/models/parking_spot_model.dart';
 import 'package:moveinsync/views/screens/payments/payment_screen.dart';
 
@@ -16,6 +17,8 @@ class ParkingConfirmationScreen extends StatefulWidget {
 }
 
 class _ParkingConfirmationScreenState extends State<ParkingConfirmationScreen> {
+  final ParkingController parkingController = Get.find<ParkingController>();
+
   String selectedVehicle = "Car";
   int selectedHours = 1;
   double totalPrice = 0.0;
@@ -28,14 +31,48 @@ class _ParkingConfirmationScreenState extends State<ParkingConfirmationScreen> {
 
   void _calculateTotal() {
     setState(() {
-      totalPrice =
-          (widget.parkingSpot.vehicleRates[selectedVehicle] ?? 0.0) *
-          selectedHours;
+      if (selectedVehicle == "Car") {
+        totalPrice = widget.parkingSpot.carRate * selectedHours;
+      } else {
+        totalPrice = widget.parkingSpot.bikeRate * selectedHours;
+      }
     });
+  }
+
+  void _confirmBooking() async {
+    bool success = await parkingController.bookSlot(
+      parkingSpotId: widget.parkingSpot.id,
+      vehicleType: selectedVehicle.toLowerCase(), 
+    );
+
+    if (success) {
+      Get.to(() => PaymentScreen(amount: totalPrice, onPaymentSuccess: (){
+        Get.back();
+        Get.back();
+        Get.snackbar(
+          "Success",
+          "Parking booked successfully!",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      },));
+     
+    } else {
+      Get.snackbar(
+        "Error",
+        "No available slots for $selectedVehicle.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    int availableSlots =
+        selectedVehicle == "Car"
+            ? widget.parkingSpot.carSlots
+            : widget.parkingSpot.bikeSlots;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -43,14 +80,13 @@ class _ParkingConfirmationScreenState extends State<ParkingConfirmationScreen> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue,
-        centerTitle: true,
       ),
       body: Padding(
         padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Parking Location
+            // Location
             Text(
               widget.parkingSpot.location,
               style: TextStyle(
@@ -59,42 +95,80 @@ class _ParkingConfirmationScreenState extends State<ParkingConfirmationScreen> {
                 color: Colors.blue,
               ),
             ),
-            SizedBox(height: 5.h),
+            SizedBox(height: 10.h),
+
+            // Address
+            Text(
+              widget.parkingSpot.address,
+              style: TextStyle(fontSize: 16.sp, color: Colors.grey[700]),
+            ),
+            SizedBox(height: 20.h),
+
+            // Vehicle Type Selection
+            Text("Select Vehicle Type:", style: TextStyle(fontSize: 16.sp)),
+            SizedBox(height: 8.h),
             Row(
               children: [
-                Icon(Icons.location_on, color: Colors.grey, size: 20.sp),
-                SizedBox(width: 5.w),
                 Expanded(
-                  child: Text(
-                    widget.parkingSpot.address,
-                    style: TextStyle(fontSize: 14.sp, color: Colors.black54),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedVehicle = "Car";
+                        _calculateTotal();
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          selectedVehicle == "Car"
+                              ? Colors.blue
+                              : Colors.grey[300],
+                    ),
+                    child: Text("Car"),
+                  ),
+                ),
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedVehicle = "Bike";
+                        _calculateTotal();
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          selectedVehicle == "Bike"
+                              ? Colors.blue
+                              : Colors.grey[300],
+                    ),
+                    child: Text("Bike"),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 40.h),
+            SizedBox(height: 20.h),
 
-            // Vehicle Type Selection
+            // Parking Rate
             Text(
-              "Select Vehicle Type",
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+              "Rate per hour: ₹${selectedVehicle == "Car" ? widget.parkingSpot.carRate : widget.parkingSpot.bikeRate}",
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
             ),
             SizedBox(height: 10.h),
-            Row(
-              children: [
-                _vehicleOption("Car"),
-                SizedBox(width: 10.w),
-                _vehicleOption("Bike"),
-              ],
+
+            // Available Slots
+            Text(
+              "Available Slots: $availableSlots",
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: availableSlots > 0 ? Colors.green : Colors.red,
+              ),
             ),
             SizedBox(height: 20.h),
 
-            // Hour Selection
-            Text(
-              "Select Number of Hours",
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10.h),
+            // Hours Dropdown
+            Text("Select Duration:", style: TextStyle(fontSize: 16.sp)),
+            SizedBox(height: 8.h),
             DropdownButton<int>(
               value: selectedHours,
               items:
@@ -115,83 +189,16 @@ class _ParkingConfirmationScreenState extends State<ParkingConfirmationScreen> {
             ),
             SizedBox(height: 20.h),
 
-            // Total Price
-            Text(
-              "Total Price: ₹$totalPrice",
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
+            // Confirm Button
+            ElevatedButton(
+              onPressed: availableSlots > 0 ? _confirmBooking : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: availableSlots > 0 ? Colors.blue : Colors.grey,
               ),
-            ),
-            SizedBox(height: 60.h),
-
-            // Pay Now Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Get.to(PaymentScreen(amount: totalPrice));
-                  Get.snackbar(
-                    "Payment",
-                    "Proceeding to Payment of ₹$totalPrice",
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: Colors.green,
-                    colorText: Colors.white,
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                ),
-                child: Text(
-                  'Pay Now',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Custom Vehicle Selection Widget
-  Widget _vehicleOption(String vehicle) {
-    bool isSelected = selectedVehicle == vehicle;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedVehicle = vehicle;
-          _calculateTotal();
-        });
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.blue : Colors.grey[300],
-          borderRadius: BorderRadius.circular(10.r),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              vehicle == "Car" ? Icons.directions_car : Icons.two_wheeler,
-              color: isSelected ? Colors.white : Colors.black54,
-            ),
-            SizedBox(width: 8.w),
-            Text(
-              vehicle,
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.white : Colors.black54,
+              child: Text(
+                availableSlots > 0
+                    ? "Pay ₹$totalPrice Now"
+                    : "No Slots Available",
               ),
             ),
           ],

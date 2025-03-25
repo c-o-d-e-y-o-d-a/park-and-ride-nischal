@@ -7,13 +7,16 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 class PaymentController extends GetxController {
   AuthController authController = Get.find<AuthController>();
   late Razorpay _razorpay;
+  final Function? onPaymentSuccess;
+
+  PaymentController({required this.onPaymentSuccess});
 
   @override
   void onInit() {
     super.onInit();
     _razorpay = Razorpay();
 
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, (){onPaymentSuccess!();});
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
@@ -36,15 +39,6 @@ class PaymentController extends GetxController {
     }
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    Get.snackbar(
-      "Payment Success",
-      "Payment ID: ${response.paymentId}",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-    );
-  }
 
   void _handlePaymentError(PaymentFailureResponse response) {
     Get.snackbar(

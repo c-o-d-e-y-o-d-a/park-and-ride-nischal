@@ -1,55 +1,93 @@
 import 'package:get/get.dart';
+import 'package:moveinsync/data/repository/parking_repository.dart';
 import 'package:moveinsync/models/parking_spot_model.dart';
 
 class ParkingController extends GetxController {
+  final ParkingRepository parkingRepository = ParkingRepository();
+
+  var metroStations = <String>[].obs;
   var parkingList = <ParkingSpot>[].obs;
   var isLoading = false.obs;
 
-  final List<String> metroStations = ["Noida Sector 18", "Rajiv Chowk"];
+  Future<List<String>> fetchMetroStations() async {
+    isLoading.value = true;
+    metroStations.value = await parkingRepository.getMetroStations();
+    isLoading.value = false;
 
-  final Map<String, List<ParkingSpot>> sampleData = {
-    "Noida Sector 18": [
-      ParkingSpot(
-        id: "1",
-        metroStation: "Noida Sector 18",
-        location: "DLF Mall Parking",
-        address: "DLF Mall, Noida",
-        distance: 0.5,
-        vehicleRates: {"Car": 40.0, "Bike": 20.0},
-      ),
-      ParkingSpot(
-        id: "2",
-        metroStation: "Noida Sector 18",
-        location: "Atta Market Parking",
-        address: "Near Atta Market, Noida",
-        distance: 0.8,
-        vehicleRates: {"Car": 30.0, "Bike": 15.0},
-      ),
-    ],
-    "Rajiv Chowk": [
-      ParkingSpot(
-        id: "3",
-        metroStation: "Rajiv Chowk",
-        location: "Connaught Place Parking",
-        address: "Connaught Place, Delhi",
-        distance: 0.4,
-        vehicleRates: {"Car": 50.0, "Bike": 25.0},
-      ),
-      ParkingSpot(
-        id: "4",
-        metroStation: "Rajiv Chowk",
-        location: "PVR Plaza Parking",
-        address: "Near PVR Plaza, Delhi",
-        distance: 0.7,
-        vehicleRates: {"Car": 45.0, "Bike": 22.0},
-      ),
-    ],
-  };
+    return metroStations; // ✅ Return fetched metro stations
+  }
 
   void fetchParkingData(String metroStation) async {
     isLoading.value = true;
-    await Future.delayed(const Duration(seconds: 1)); // Simulate loading
-    parkingList.value = sampleData[metroStation] ?? [];
+    parkingList.value = await parkingRepository.getParkingSpots(metroStation);
     isLoading.value = false;
+  }
+
+  Future<bool> bookSlot({
+    required String parkingSpotId,
+    required String vehicleType, // "car" or "bike"
+  }) async {
+    bool result = await parkingRepository.bookParkingSlot(
+      parkingSpotId: parkingSpotId,
+      vehicleType: vehicleType,
+    );
+
+    if (result) {
+    
+
+      // ✅ Refresh UI after booking
+      ParkingSpot updatedSpot = parkingList.firstWhere(
+        (spot) => spot.id == parkingSpotId,
+        orElse:
+            () => ParkingSpot(
+              id: "",
+              metroStation: "",
+              location: "",
+              address: "",
+              distance: 0.0,
+              carRate: 0.0,
+              bikeRate: 0.0,
+              carSlots: 0,
+              bikeSlots: 0,
+            ),
+      );
+
+      if (updatedSpot.id.isNotEmpty) {
+        if (vehicleType == "car") {
+          updatedSpot = ParkingSpot(
+            id: updatedSpot.id,
+            metroStation: updatedSpot.metroStation,
+            location: updatedSpot.location,
+            address: updatedSpot.address,
+            distance: updatedSpot.distance,
+            carRate: updatedSpot.carRate,
+            bikeRate: updatedSpot.bikeRate,
+            carSlots: updatedSpot.carSlots - 1,
+            bikeSlots: updatedSpot.bikeSlots,
+          );
+        } else if (vehicleType == "bike") {
+          updatedSpot = ParkingSpot(
+            id: updatedSpot.id,
+            metroStation: updatedSpot.metroStation,
+            location: updatedSpot.location,
+            address: updatedSpot.address,
+            distance: updatedSpot.distance,
+            carRate: updatedSpot.carRate,
+            bikeRate: updatedSpot.bikeRate,
+            carSlots: updatedSpot.carSlots,
+            bikeSlots: updatedSpot.bikeSlots - 1,
+          );
+        }
+
+        parkingList.removeWhere((spot) => spot.id == parkingSpotId);
+        parkingList.add(updatedSpot);
+        parkingList.refresh();
+      }
+
+      return true;
+    } else {
+      Get.snackbar("Error", "Failed to book parking slot");
+      return false;
+    }
   }
 }
