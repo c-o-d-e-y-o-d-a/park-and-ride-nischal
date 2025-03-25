@@ -2,21 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:mapbox_search/mapbox_search.dart';
 import 'package:moveinsync/data/controller/auth_controller.dart';
 import 'package:moveinsync/data/controller/ride_controller.dart';
 import 'package:moveinsync/data/controller/ride_history_controller.dart';
 import 'package:moveinsync/routes/app_routes.dart';
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  Get.put(AuthController());
+  Get.put(RideController());
+  Get.put(RideHistoryController());
+  MapBoxSearch.init(dotenv.env['MAPBOX_ACCESS_TOKEN']!);
 
-void main() async{
-   WidgetsFlutterBinding.ensureInitialized();
-   await dotenv.load(fileName: ".env");
-   Get.put(AuthController()); 
-Get.put(RideController());
-Get.put(RideHistoryController());
-
-    
-  
   runApp(const MyApp());
 }
 
@@ -34,12 +33,10 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           initialRoute: '/onboarding',
           getPages: AppRoutes.routes,
-
+      
           home: child,
         );
       },
-     
     );
-    
   }
 }
