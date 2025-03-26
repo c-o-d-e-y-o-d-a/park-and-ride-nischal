@@ -14,9 +14,9 @@ Park and Ride - Nischal is designed to help users find and manage parking spaces
 
 ## Features
 - **User Registration and Authentication:** Secure user sign-up and login functionality.
-- **Parking Space Booking:** Users can book parking spaces in advance.
+- **Parking Space Booking:** Users can book parking spaces beforehand.
 - **Real-Time Updates:** Provides real-time updates on parking space availability.
-- **Admin Dashboard:** A dashboard for admin users to manage the system.
+- **Admin Dashboard:** A dashboard for  users to manage the system.
 - **Payment Integration:** Secure payment processing for parking fees.
 
 ## Installation
